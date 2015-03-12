@@ -1,23 +1,36 @@
-var domCompiler = require('./dom-compiler.js');
-var stringCompiler = require('./string-compiler.js');
+var domParser = require('./dom-parser.js');
+var stringParser = require('./string-parser.js');
+var fElement = require('./dom-element.js');
+var fText = require('./dom-text.js');
 
-function Fly() {
-
-};
-
-Fly.prototype.template = function flyTemplate(from) {
-  this.structure = parseTemplate(from);
+function Fly(q) {
+  this.compile(this.parse(q));
 
 };
 
+Fly.prototype.compile = function(obj) {
+  var nodes = obj.map(function(element) {
+    if (element.type === 'tag') {
+      return new fElement(element);
+    } else {
+      return new fText(element);
+    }
+  });
+  return new FastTemplate(nodes);
+};
 
-flyTemplate.prototype.parseTemplate = function(template) {
-  if (from typeof 'string') {
-    return stringCompiler(template);
+Fly.prototype.parse = function() {
+  var parser;
+
+  if (q typeof 'string') {
+    parser = stringParser;
+  } else if (q instanceof Node || q instanceof NodeList)
+    parser = domParser;
   }
-  if (from typeof Node || from typeof NodeList) {
-    return domCompiler(template);
+
+  if (!parser) {
+    throw new Error('Parser not found');
   }
-  throw new Error('Not sure what to do with that.');
-  // maybe support arrays of nodes?
-}
+
+  return parser(q);
+};
